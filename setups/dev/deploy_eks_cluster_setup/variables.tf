@@ -1,0 +1,77 @@
+variable "region" {
+  default = "us-east-2"
+}
+
+variable "map_accounts" {
+  description = "Additional AWS account numbers to add to the aws-auth configmap."
+  type        = list(string)
+
+  default = [
+    "777777777777",
+    "888888888888",
+  ]
+}
+
+variable "map_roles" {
+  description = "Additional IAM roles to add to the aws-auth configmap."
+  type = list(object({
+    rolearn  = string
+    username = string
+    groups   = list(string)
+  }))
+
+  default = [
+    {
+      rolearn  = "arn:aws:iam::66666666666:role/role1"
+      username = "role1"
+      groups   = ["system:masters"]
+    },
+  ]
+}
+
+variable "map_users" {
+  description = "Additional IAM users to add to the aws-auth configmap."
+  type = list(object({
+    userarn  = string
+    username = string
+    groups   = list(string)
+  }))
+
+  default = [
+    {
+      userarn  = "arn:aws:iam::66666666666:user/user1"
+      username = "user1"
+      groups   = ["system:masters"]
+    },
+    {
+      userarn  = "arn:aws:iam::66666666666:user/user2"
+      username = "user2"
+      groups   = ["system:masters"]
+    },
+  ]
+}
+variable win_asg_desired_capacity {
+  default = 1 
+}
+variable win_asg_min_size {
+  default = 1
+}
+variable win_asg_max_size {
+  default = 3
+}
+variable win_instance_type {
+  default = "t2.medium"
+}
+
+variable lnx_asg_desired_capacity {
+  default = 1
+}
+variable lnx_asg_min_size {
+  default = 1
+}
+variable lnx_asg_max_size {
+  default = 3
+}
+variable lnx_instance_type {
+  default = "t2.medium"
+}

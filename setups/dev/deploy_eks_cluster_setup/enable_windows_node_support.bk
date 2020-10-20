@@ -1,0 +1,15 @@
+resource null_resource windows-node-support {
+  depends_on = [ module.eks,helm_release.ins-cluster-autoscaler ]
+  provisioner local-exec {
+    command = <<EOT
+      kubectl apply -f https://amazon-eks.s3.us-west-2.amazonaws.com/manifests/us-west-2/vpc-resource-controller/latest/vpc-resource-controller.yaml --kubeconfig "kubeconfig_${local.cluster_name}"
+      curl -o webhook-create-signed-cert.sh https://amazon-eks.s3.us-west-2.amazonaws.com/manifests/us-west-2/vpc-admission-webhook/latest/webhook-create-signed-cert.sh
+      curl -o webhook-patch-ca-bundle.sh https://amazon-eks.s3.us-west-2.amazonaws.com/manifests/us-west-2/vpc-admission-webhook/latest/webhook-patch-ca-bundle.sh
+      curl -o vpc-admission-webhook-deployment.yaml https://amazon-eks.s3.us-west-2.amazonaws.com/manifests/us-west-2/vpc-admission-webhook/latest/vpc-admission-webhook-deployment.yaml
+      chmod +x webhook-create-signed-cert.sh webhook-patch-ca-bundle.sh
+      ./webhook-create-signed-cert.sh 
+      cat ./vpc-admission-webhook-deployment.yaml | ./webhook-patch-ca-bundle.sh > vpc-admission-webhook.yaml
+      kubectl apply -f vpc-admission-webhook.yaml --kubeconfig "kubeconfig_${local.cluster_name}"
+   EOT  
+  } 
+}
